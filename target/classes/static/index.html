@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <div>Event</div>
+                <span>Hub</span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="active">Explore</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+            <div class="auth-nav" id="auth-nav-links"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="glass-panel">
+                <h1>Discover Amazing Events</h1>
+                <p class="lead">Find and book tickets for concerts, conferences, workshops, and more</p>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search events...">
+                    <button class="btn btn-accent" id="search-btn">Search</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section class="categories">
+            <div class="glass-panel">
+                <h2>Popular Categories</h2>
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <div class="category-icon">🎵</div>
+                        <h3>Music</h3>
+                        <p>Concerts, festivals, live performances</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">💼</div>
+                        <h3>Business</h3>
+                        <p>Conferences, workshops, networking</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🎨</div>
+                        <h3>Arts</h3>
+                        <p>Exhibitions, theater, performances</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🏃</div>
+                        <h3>Sports</h3>
+                        <p>Matches, tournaments, fitness events</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Events -->
+        <section class="featured-events">
+            <div class="glass-panel">
+                <h2>Featured Events</h2>
+                <div class="events-grid" id="events-grid">
+                    <!-- Events will be populated here by JavaScript -->
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading events...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="glass-panel">
+                <h2>Create Your Own Event</h2>
+                <p>Organizing an event? Use our platform to manage ticket sales and attendees.</p>
+                <a href="login.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 Event Management System. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
