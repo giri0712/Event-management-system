@@ -3,74 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Management System</title>
+    <title>EventHub - Discover Amazing Events</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="navbar">
             <div class="logo">
-                <div>Event</div>
-                <span>Hub</span>
+                <span class="dot">&#x25C6;</span> EventHub
             </div>
             <ul class="nav-links" id="nav-links">
                 <li><a href="index.html" class="active">Explore</a></li>
+                <li><a href="rankings.html">Rankings</a></li>
                 <li><a href="dashboard.html">Dashboard</a></li>
             </ul>
             <div class="auth-nav" id="auth-nav-links"></div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main>
         <!-- Hero Section -->
         <section class="hero">
-            <div class="glass-panel">
-                <h1>Discover Amazing Events</h1>
-                <p class="lead">Find and book tickets for concerts, conferences, workshops, and more</p>
-                <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Search events...">
-                    <button class="btn btn-accent" id="search-btn">Search</button>
+            <h1>Where Ideas Meet<br>Experience.</h1>
+            <p class="lead">Discover and book tickets for the best tech events, workshops, conferences, and networking meetups across India.</p>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search events, topics, or locations...">
+                <button class="btn btn-primary" id="search-btn">Search</button>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="number">1,200+</span>
+                    <span class="label">Events Hosted</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="number">50K+</span>
+                    <span class="label">Attendees</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="number">200+</span>
+                    <span class="label">Organizations</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="number">15</span>
+                    <span class="label">Cities</span>
                 </div>
             </div>
         </section>
 
         <!-- Categories -->
         <section class="categories">
-            <div class="glass-panel">
-                <h2>Popular Categories</h2>
+            <div class="container">
+                <div class="section-header">
+                    <h2>Popular Categories</h2>
+                </div>
                 <div class="categories-grid">
                     <div class="category-card">
-                        <div class="category-icon">🎵</div>
+                        <div class="category-icon">&#127925;</div>
                         <h3>Music</h3>
                         <p>Concerts, festivals, live performances</p>
                     </div>
                     <div class="category-card">
-                        <div class="category-icon">💼</div>
+                        <div class="category-icon">&#128188;</div>
                         <h3>Business</h3>
                         <p>Conferences, workshops, networking</p>
                     </div>
                     <div class="category-card">
-                        <div class="category-icon">🎨</div>
+                        <div class="category-icon">&#127912;</div>
                         <h3>Arts</h3>
-                        <p>Exhibitions, theater, performances</p>
+                        <p>Exhibitions, theater, design</p>
                     </div>
                     <div class="category-card">
-                        <div class="category-icon">🏃</div>
+                        <div class="category-icon">&#127939;</div>
                         <h3>Sports</h3>
-                        <p>Matches, tournaments, fitness events</p>
+                        <p>Matches, tournaments, fitness</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Featured Events -->
-        <section class="featured-events">
-            <div class="glass-panel">
-                <h2>Featured Events</h2>
+        <section class="events-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Upcoming Events</h2>
+                    <a href="#" class="btn btn-ghost">View All &rarr;</a>
+                </div>
                 <div class="events-grid" id="events-grid">
-                    <!-- Events will be populated here by JavaScript -->
                     <div class="loading-spinner">
                         <div class="spinner"></div>
                         <p>Loading events...</p>
@@ -79,24 +97,39 @@
             </div>
         </section>
 
-        <!-- Call to Action -->
+        <!-- Team Rankings Preview -->
+        <section class="rankings-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Team Rankings</h2>
+                    <a href="rankings.html" class="btn btn-ghost">Full Leaderboard &rarr;</a>
+                </div>
+                <div id="rankings-preview">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading rankings...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
         <section class="cta-section">
-            <div class="glass-panel">
-                <h2>Create Your Own Event</h2>
-                <p>Organizing an event? Use our platform to manage ticket sales and attendees.</p>
-                <a href="login.html" class="btn btn-primary">Get Started</a>
+            <div class="cta-card">
+                <h2>Organize Your Next Event</h2>
+                <p>Join hundreds of organizers using EventHub to manage registrations, ticketing, and attendee engagement.</p>
+                <a href="register.html" class="btn btn-primary btn-lg">Get Started Free</a>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p>&copy; 2026 Event Management System. All rights reserved.</p>
+            <p>&copy; 2026 EventHub. All rights reserved.</p>
             <div class="footer-links">
-                <a href="#">Terms of Service</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact Us</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
             </div>
         </div>
     </footer>

@@ -1,0 +1,31 @@
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/C:/Apache/maven/apache-maven-3.9.11/lib/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.eventmgmt:event-management >-------------------
+[INFO] Building event-management 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ event-management ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ event-management ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 34 source files with javac [debug parameters release 25] to target\classes
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[28,9] org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer in org.springframework.data.redis.serializer has been deprecated and marked for removal
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[41,9] org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer in org.springframework.data.redis.serializer has been deprecated and marked for removal
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[55,13] org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer in org.springframework.data.redis.serializer has been deprecated and marked for removal
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[56,9] org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer in org.springframework.data.redis.serializer has been deprecated and marked for removal
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[56,62] org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer in org.springframework.data.redis.serializer has been deprecated and marked for removal
+[WARNING] /e:/Event management/src/main/java/com/eventmgmt/config/RedisConfig.java:[61,19] setObjectMapper(com.fasterxml.jackson.databind.ObjectMapper) in org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer has been deprecated and marked for removal
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:14 min
+[INFO] Finished at: 2026-07-21T11:52:56+05:30
+[INFO] ------------------------------------------------------------------------

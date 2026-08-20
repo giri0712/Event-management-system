@@ -3,43 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Details - Event Management System</title>
+    <title>Event Details - EventHub</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="navbar">
-            <div class="logo">
-                <div>Event</div>
-                <span>Hub</span>
-            </div>
-            <ul class="nav-links" id="nav-links">
+            <div class="logo"><span class="dot">&#x25C6;</span> EventHub</div>
+            <ul class="nav-links">
                 <li><a href="index.html">Explore</a></li>
+                <li><a href="rankings.html">Rankings</a></li>
                 <li><a href="dashboard.html">Dashboard</a></li>
             </ul>
             <div class="auth-nav" id="auth-nav-links"></div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main>
         <div class="event-detail-container" id="event-detail-container">
-            <!-- Event Detail Loading State -->
-            <div class="loading-spinner" style="text-align: center; padding: 3rem;">
+            <div class="loading-spinner">
                 <div class="spinner"></div>
                 <p>Loading event details...</p>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p>&copy; 2026 Event Management System. All rights reserved.</p>
+            <p>&copy; 2026 EventHub. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Terms</a><a href="#">Privacy</a><a href="#">Contact</a>
+            </div>
         </div>
     </footer>
-
+    <script src="js/mock-razorpay.js"></script>
     <script src="js/app.js"></script>
     <script src="js/event-detail.js"></script>
 </body>

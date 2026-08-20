@@ -1,243 +1,121 @@
-package com.eventmgmt.exception;
+// =============================================
+// EventHub - Core JavaScript (app.js)
+// =============================================
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.ServletRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+const API_BASE_URL = window.origin + "/api";
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-@ControllerAdvice
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
-        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+// =============================================
+// API Helper with Session Cookie Auth
+// =============================================
+async function fetchAPI(endpoint, options = {}) {
+    const defaultOptions = {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+    };
+    const mergedOptions = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...options.headers } };
+    const response = await fetch(API_BASE_URL + endpoint, mergedOptions);
+    if (response.status === 401 || response.status === 403) {
+        window.currentUser = null;
+        if (!window.location.pathname.includes("login.html")) {
+            showToast("Session expired. Please sign in again.", "warning");
+            setTimeout(() => { window.location.href = "login.html"; }, 1500);
+        }
+        throw new Error("Unauthorized");
     }
-
-    @ExceptionHandler(PaymentFailedException.class)
-    public ResponseEntity<Map<String, Object>> handlePaymentFailed(PaymentFailedException ex) {
-        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    @ExceptionHandler(TicketCapacityExceededException.class)
-    public ResponseEntity<Map<String, Object>> handleTicketCapacityExceeded(TicketCapacityExceededException ex) {
-        return createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-    }
-
-    @ExceptionHandler(UnauthorizedAccessException.class)
-    public ResponseEntity<Map<String, Object>> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
-        return createErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
-    }
-
-    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<Map<String, Object>> handleConcurrencyConflict(ObjectOptimisticLockingFailureException ex) {
-        return createErrorResponse(HttpStatus.CONFLICT, "Transaction conflict: tickets were purchased by another user. Please retry booking.");
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        body.put("validationErrors", errors);
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<Map<String, Object>> handleBindException(BindException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        body.put("validationErrors", errors);
-
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Map<String, Object>> handleMissingServletRequestParameter(MissingServletRequestParameterException ex) {
-        return createErrorResponse(HttpStatus.BAD_REQUEST, "Missing request parameter: " + ex.getParameterName"""
-    container.appendChild(toast)
-
-    // Auto-remove after 4 seconds
-    const timer = setTimeout(() => {
-        toast.style.animation = 'slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) reverse forwards';
-        setTimeout(() => toast.remove(), 300);
-    }, 4000)
-
-    toast.querySelector('.toast-close').addEventListener('click', () => {
-        clearTimeout(timer)
-        toast.remove()
-    })
+    if (response.status === 204) return null;
+    const ct = response.headers.get("content-type");
+    let data = (ct && ct.includes("application/json")) ? await response.json() : await response.text();
+    if (!response.ok) throw new Error((data && (data.message || data.error)) || "Request failed");
+    return data;
 }
 
-// Format Date & Time locally
+// =============================================
+// Toast Notifications
+// =============================================
+function showToast(message, type = "info") {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.style.cssText = "position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast toast-" + type;
+    const icons = { success: "✓", error: "✗", warning: "⚠", info: "ℹ" };
+    toast.innerHTML = "<span class="toast-icon">" + (icons[type] || icons.info) + "</span><span class="toast-message">" + message + "</span><button class="toast-close">&times;</button>";
+    container.appendChild(toast);
+    const timer = setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 300); }, 4000);
+    toast.querySelector(".toast-close").addEventListener("click", () => { clearTimeout(timer); toast.remove(); });
+}
+
+// =============================================
+// Razorpay Checkout Helper
+// =============================================
+function initiateRazorpayCheckout(options) {
+    return new Promise((resolve, reject) => {
+        if (typeof Razorpay === "undefined") { reject(new Error("Razorpay SDK not loaded.")); return; }
+        const rzp = new Razorpay({
+            key: options.key,
+            amount: options.amount,
+            currency: options.currency || "INR",
+            name: options.name || "EventHub",
+            description: options.description || "Event Booking",
+            order_id: options.orderId,
+            handler: function(response) { resolve(response); },
+            prefill: { name: options.prefillName || "", email: options.prefillEmail || "", contact: options.prefillContact || "" },
+            notes: options.notes || {},
+            theme: { color: "#6366f1" },
+            modal: { ondismiss: function() { reject(new Error("Payment cancelled by user.")); } }
+        });
+        rzp.open();
+    });
+}
+
+// =============================================
+// Date & Currency Formatting
+// =============================================
 function formatDate(dateStr) {
-    const d = new Date(dateStr)
-    return d.toLocaleDateString('en-US', {
-        weekday: 'short',
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
+    return new Date(dateStr).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-// Format Currency
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount);
 }
 
-// Dynamic Navigation update based on Auth status
+// =============================================
+// Navigation
+// =============================================
 function updateNavigation() {
-    const authNav = document.getElementById('auth-nav-links')
-    if (!authNav) return
-
+    const authNav = document.getElementById("auth-nav-links");
+    if (!authNav) return;
     if (window.currentUser) {
-        authNav.innerHTML = `
-            <li><a href="index.html" class="${isActivePage('index.html')}">Explore</a></li>
-            <li><a href="dashboard.html" class="${isActivePage('dashboard.html')}">Dashboard</a></li>
-            <li>
-                <button onclick="handleLogout()" class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">
-                    Sign Out
-                </button>
-            </li>
-            <li style="margin-left: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
-                    ${window.currentUser.fullName.charAt(0).toUpperCase()}
-                </div>
-            </li>
-        `
+        authNav.innerHTML = "<li><a href="index.html">Explore</a></li><li><a href="dashboard.html">Dashboard</a></li><li><button onclick="handleLogout()" class="btn btn-secondary">Sign Out</button></li>";
     } else {
-        authNav.innerHTML = `
-            <li><a href="index.html" class="${isActivePage('index.html')}">Explore</a></li>
-            <li><a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Sign In</a></li>
-        `
+        authNav.innerHTML = "<li><a href="index.html">Explore</a></li><li><a href="login.html" class="btn btn-primary">Sign In</a></li>";
     }
 }
 
-function isActivePage(filename) {
-    const currentPage = window.location.pathname.split('/').pop()
-    if (currentPage === '' && filename === 'index.html') return 'active'
-    return currentPage === filename ? 'active' : ''
-}
-
-// Global Sign-Out execution
+// =============================================
+// Auth
+// =============================================
 async function handleLogout() {
     try {
-        await fetchAPI('/api/auth/logout', { method: 'POST' })
-        window.currentUser = null
-        showToast('Logged out successfully', 'success')
-        setTimeout(() => {
-            window.location.href = 'index.html'
-        }, 1000)
-    } catch (err) {
-        showToast(err.message || 'Failed to logout', 'error')
-    }
+        await fetchAPI("/api/auth/logout", { method: "POST" });
+        window.currentUser = null;
+        showToast("Logged out successfully", "success");
+        setTimeout(() => { window.location.href = "index.html"; }, 1000);
+    } catch (err) { showToast(err.message || "Failed to logout", "error"); }
 }
 
-// Check active session on load
 async function checkAuthSession() {
     try {
-        const user = await fetchAPI('/api/auth/me')
-        if (user && !user.error) {
-            window.currentUser = user
-        }
-    } catch (err) {
-        // Ignored: User not logged in
-    } finally {
-        updateNavigation()
-    }
+        const user = await fetchAPI("/api/auth/me");
+        if (user && !user.error) window.currentUser = user;
+    } catch (err) { /* not logged in */ } finally { updateNavigation(); }
 }
 
-// Generate Mock QR Code matrix
-function generateMockQRCode(parentEl, payload) {
-    if (!parentEl) return
-    parentEl.innerHTML = ''
-
-    // Hash payload to pseudo-randomize pixel distribution
-    let hash = 0
-    for (let i = 0; i < payload.length; i++) {
-        hash = payload.charCodeAt(i) + ((hash << 5) - hash)
-    }
-
-    const size = 16 // 16x16 QR grid
-    parentEl.style.width = '100px'
-    parentEl.style.height = '100px'
-    parentEl.style.display = 'flex'
-    parentEl.style.flexWrap = 'wrap'
-    parentEl.style.background = 'white'
-    parentEl.style.padding = '4px'
-
-    for (let row = 0; row < size; row++) {
-        for (let col = 0; col < size; col++) {
-            const pixel = document.createElement('div')
-            pixel.style.width = '6px'
-            pixel.style.height = '6px'
-
-            // Generate standard positioning block markers in corners
-            const isCorner =
-                (row < 4 && col < 4) ||
-                (row < 4 && col >= size - 4) ||
-                (row >= size - 4 && col < 4)
-
-            if (isCorner) {
-                // Outer ring black, inner dot black, middle white
-                const inner = (row === 0 || row === 3 || col === 0 || col === 3 ||
-                               row === size - 1 || row === size - 4 || col === size - 1 || col === size - 4)
-                pixel.style.backgroundColor = inner ? '#000' : '#fff'
-                // Adjust for middle dot
-                if ((row === 1 && col === 1) || (row === 1 && col === size - 2) || (row === size - 2 && col === 1) ||
-                    (row === 2 && col === 2) || (row === 2 && col === size - 3) || (row === size - 3 && col === 2)) {
-                    pixel.style.backgroundColor = '#000'
-                }
-            } else {
-                // Pseudo-random distribution based on hash logic
-                const val = Math.abs(Math.sin(hash + (row * size) + col) * 1000)
-                pixel.style.backgroundColor = (val % 2 < 1) ? '#000' : '#fff'
-            }
-            parentEl.appendChild(pixel)
-        }
-    }
-}
-
-// Initialise auth session extraction
-document.addEventListener('DOMContentLoaded', checkAuthSession)
+// =============================================
+// Init
+// =============================================
+document.addEventListener("DOMContentLoaded", checkAuthSession);

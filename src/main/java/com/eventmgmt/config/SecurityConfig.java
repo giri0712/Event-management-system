@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/me").permitAll()
                 // Public event browsing
                 .requestMatchers(HttpMethod.GET, "/api/events", "/api/events/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/teams").permitAll()
                 // Secured APIs
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/organizer/**").hasAnyRole("ORGANIZER", "ADMIN")
