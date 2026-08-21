@@ -1,121 +1,113 @@
-// =============================================
 // EventHub - Core JavaScript (app.js)
-// =============================================
+var API_BASE_URL = window.origin + "/api";
 
-const API_BASE_URL = window.origin + "/api";
-
-// =============================================
-// API Helper with Session Cookie Auth
-// =============================================
-async function fetchAPI(endpoint, options = {}) {
-    const defaultOptions = {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-    };
-    const mergedOptions = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...options.headers } };
-    const response = await fetch(API_BASE_URL + endpoint, mergedOptions);
-    if (response.status === 401 || response.status === 403) {
+async function fetchAPI(endpoint, options) {
+    options = options || {};
+    var hdrs = Object.assign({"Content-Type":"application/json"}, options.headers || {});
+    var opts = Object.assign({credentials:"include"}, options, {headers:hdrs});
+    var resp = await fetch(API_BASE_URL + endpoint, opts);
+    if (resp.status === 401 || resp.status === 403) {
         window.currentUser = null;
         if (!window.location.pathname.includes("login.html")) {
-            showToast("Session expired. Please sign in again.", "warning");
-            setTimeout(() => { window.location.href = "login.html"; }, 1500);
+            showToast("Session expired.", "warning");
+            setTimeout(function(){ window.location.href = "login.html"; }, 1500);
         }
         throw new Error("Unauthorized");
     }
-    if (response.status === 204) return null;
-    const ct = response.headers.get("content-type");
-    let data = (ct && ct.includes("application/json")) ? await response.json() : await response.text();
-    if (!response.ok) throw new Error((data && (data.message || data.error)) || "Request failed");
+    if (resp.status === 204) return null;
+    var ct = resp.headers.get("content-type");
+    var data = (ct && ct.indexOf("json") !== -1) ? await resp.json() : await resp.text();
+    if (!resp.ok) throw new Error((data && (data.message || data.error)) || "Request failed");
     return data;
 }
 
-// =============================================
-// Toast Notifications
-// =============================================
-function showToast(message, type = "info") {
-    let container = document.getElementById("toast-container");
+function showToast(message, type) {
+    type = type || "info";
+    var container = document.getElementById("toast-container");
     if (!container) {
         container = document.createElement("div");
         container.id = "toast-container";
         container.style.cssText = "position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;";
         document.body.appendChild(container);
     }
-    const toast = document.createElement("div");
+    var toast = document.createElement("div");
     toast.className = "toast toast-" + type;
-    const icons = { success: "✓", error: "✗", warning: "⚠", info: "ℹ" };
-    toast.innerHTML = "<span class="toast-icon">" + (icons[type] || icons.info) + "</span><span class="toast-message">" + message + "</span><button class="toast-close">&times;</button>";
+    var icons = {success:"\u2713", error:"\u2717", warning:"\u26A0", info:"\u2139"};
+    var iconSpan = document.createElement("span");
+    iconSpan.className = "toast-icon";
+    iconSpan.textContent = icons[type] || icons.info;
+    var msgSpan = document.createElement("span");
+    msgSpan.className = "toast-message";
+    msgSpan.textContent = message;
+    var closeBtn = document.createElement("button");
+    closeBtn.className = "toast-close";
+    closeBtn.textContent = "\u00D7";
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
+    toast.appendChild(closeBtn);
     container.appendChild(toast);
-    const timer = setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 300); }, 4000);
-    toast.querySelector(".toast-close").addEventListener("click", () => { clearTimeout(timer); toast.remove(); });
+    var timer = setTimeout(function(){ toast.style.opacity="0"; setTimeout(function(){toast.remove();},300); }, 4000);
+    closeBtn.addEventListener("click", function(){ clearTimeout(timer); toast.remove(); });
 }
 
-// =============================================
-// Razorpay Checkout Helper
-// =============================================
 function initiateRazorpayCheckout(options) {
-    return new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
         if (typeof Razorpay === "undefined") { reject(new Error("Razorpay SDK not loaded.")); return; }
-        const rzp = new Razorpay({
+        var rzp = new Razorpay({
             key: options.key,
             amount: options.amount,
             currency: options.currency || "INR",
             name: options.name || "EventHub",
             description: options.description || "Event Booking",
             order_id: options.orderId,
-            handler: function(response) { resolve(response); },
-            prefill: { name: options.prefillName || "", email: options.prefillEmail || "", contact: options.prefillContact || "" },
+            handler: function(resp) { resolve(resp); },
+            prefill: {name: options.prefillName||"", email: options.prefillEmail||"", contact: options.prefillContact||""},
             notes: options.notes || {},
-            theme: { color: "#6366f1" },
-            modal: { ondismiss: function() { reject(new Error("Payment cancelled by user.")); } }
+            theme: {color: "#ff6b35"},
+            modal: {ondismiss: function(){ reject(new Error("Payment cancelled.")); }}
         });
         rzp.open();
     });
 }
 
-// =============================================
-// Date & Currency Formatting
-// =============================================
 function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-US", {weekday:"short", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount);
+    if (amount == null) return "\u20B90";
+    return new Intl.NumberFormat("en-IN", {style:"currency", currency:"INR"}).format(amount);
 }
 
-// =============================================
-// Navigation
-// =============================================
 function updateNavigation() {
-    const authNav = document.getElementById("auth-nav-links");
+    var authNav = document.getElementById("auth-nav-links");
     if (!authNav) return;
     if (window.currentUser) {
-        authNav.innerHTML = "<li><a href="index.html">Explore</a></li><li><a href="dashboard.html">Dashboard</a></li><li><button onclick="handleLogout()" class="btn btn-secondary">Sign Out</button></li>";
+        var initial = window.currentUser.fullName.charAt(0).toUpperCase();
+        authNav.innerHTML = "<li><button onclick=\"handleLogout()\" class=\"btn btn-ghost btn-sm\">Sign Out</button></li>" +
+            "<li><div style=\"width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff6b35,#ff8a5c);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;\">" + initial + "</div></li>";
     } else {
-        authNav.innerHTML = "<li><a href="index.html">Explore</a></li><li><a href="login.html" class="btn btn-primary">Sign In</a></li>";
+        authNav.innerHTML = "<li><a href=\"login.html\" class=\"btn btn-ghost btn-sm\">Sign In</a></li>" +
+            "<li><a href=\"register.html\" class=\"btn btn-primary btn-sm\">Sign Up</a></li>";
     }
 }
 
-// =============================================
-// Auth
-// =============================================
 async function handleLogout() {
     try {
-        await fetchAPI("/api/auth/logout", { method: "POST" });
+        await fetchAPI("/api/auth/logout", {method:"POST"});
         window.currentUser = null;
         showToast("Logged out successfully", "success");
-        setTimeout(() => { window.location.href = "index.html"; }, 1000);
+        setTimeout(function(){ window.location.href = "index.html"; }, 800);
     } catch (err) { showToast(err.message || "Failed to logout", "error"); }
 }
 
 async function checkAuthSession() {
     try {
-        const user = await fetchAPI("/api/auth/me");
+        var user = await fetchAPI("/api/auth/me");
         if (user && !user.error) window.currentUser = user;
-    } catch (err) { /* not logged in */ } finally { updateNavigation(); }
+    } catch (err) {}
+    finally { updateNavigation(); }
 }
 
-// =============================================
-// Init
-// =============================================
 document.addEventListener("DOMContentLoaded", checkAuthSession);
